@@ -40,6 +40,15 @@ export const routes: AppRouteRecordRaw[] = [
     },
   },
   {
+    path: "/table",
+    name: "table",
+    component: () => import("@/views/TableDemo.vue"),
+    meta: {
+      title: "表格演示",
+      icon: "table",
+    },
+  },
+  {
     path: "/user",
     name: "user",
     meta: {
