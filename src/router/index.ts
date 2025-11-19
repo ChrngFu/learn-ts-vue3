@@ -1,8 +1,17 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
-import type { Menu } from "tdesign-vue-next";
+
+// 定义菜单项接口
+interface MenuItem {
+  label: string;
+  key: string;
+  value: string;
+  icon?: string;
+  disabled?: boolean;
+  children?: MenuItem[];
+}
 
 // 定义路由类型，扩展RouteRecordRaw以包含meta信息
-export interface AppRouteRecordRaw extends RouteRecordRaw {
+export interface AppRouteRecordRaw extends Omit<RouteRecordRaw, 'children'> {
   path: string;
   name?: string;
   component?: any;
@@ -77,8 +86,8 @@ export const routes: AppRouteRecordRaw[] = [
 ];
 
 // 路由菜单转换函数 - 生成符合 TDesign 菜单结构的菜单项
-export function generateMenuFromRoutes(routes: AppRouteRecordRaw[], parentPath: string = ""): Menu.Item[] {
-  const menuItems: Menu.Item[] = [];
+export function generateMenuFromRoutes(routes: AppRouteRecordRaw[], parentPath: string = ""): MenuItem[] {
+  const menuItems: MenuItem[] = [];
 
   routes.forEach(route => {
     // 跳过重定向和隐藏的路由
@@ -109,7 +118,7 @@ export function generateMenuFromRoutes(routes: AppRouteRecordRaw[], parentPath: 
     }
 
     // 创建菜单项对象
-    const menuItem: Menu.Item = {
+    const menuItem: MenuItem = {
       label: route.meta?.title || String(route.name),
       key: String(route.name),
       value: fullPath, // 存储完整的路径信息
@@ -142,7 +151,7 @@ export function generateMenuFromRoutes(routes: AppRouteRecordRaw[], parentPath: 
 // 创建路由实例
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes: routes as RouteRecordRaw[],
 });
 
 export default router;

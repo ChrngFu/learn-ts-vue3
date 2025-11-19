@@ -48,7 +48,8 @@
 
       // 获取内存使用情况（如果浏览器支持）
       if (performance && "memory" in performance) {
-        memoryUsage.value = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2) as unknown as number;
+        const memoryInfo = performance as unknown as { memory: { usedJSHeapSize: number } };
+        memoryUsage.value = Number((memoryInfo.memory.usedJSHeapSize / 1024 / 1024).toFixed(2));
       }
 
       loading.value = false;
@@ -116,7 +117,7 @@
         </div>
 
         <template v-else>
-          <VirtualList :data="listData" height="600px" :itemHeight="itemHeight" keyField="id" buffer="3">
+          <VirtualList :data="listData" height="600px" :itemHeight="itemHeight" keyField="id" :buffer="3">
             <template #default="{ item, index }">
               <div class="list-item-content">
                 <div class="item-index">{{ index + 1 }}</div>

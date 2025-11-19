@@ -31,7 +31,8 @@
 
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted } from "vue";
-  import { themeManager, ThemeType } from "@/utils/themeManager";
+  import { themeManager } from "@/utils/themeManager";
+  import type { ThemeType } from "@/utils/themeManager";
 
   // 响应式变量存储当前主题
   const currentTheme = ref<ThemeType>("system");

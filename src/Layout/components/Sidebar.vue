@@ -1,20 +1,15 @@
 <script setup lang="ts">
-  import { ref, onMounted, getCurrentInstance } from "vue";
+  import { ref, onMounted } from "vue";
   import { useRouter } from "vue-router";
-  import type { Menu } from "tdesign-vue-next";
-  import { MenuProps } from "tdesign-vue-next";
+  import type { MenuProps } from "tdesign-vue-next";
+
+  // 为了避免命名冲突，重新导出Menu组件
   import { routes, generateMenuFromRoutes } from "@/router/index";
   import themeManager from "@/utils/themeManager";
-
-  // 获取当前组件实例以访问全局属性
-  const instance = getCurrentInstance();
-  const globalProperties = instance?.appContext.config.globalProperties;
 
   // 调试函数，检查主题值
   const debugTheme = () => {
     console.log("Theme Manager Dark Mode:", themeManager.isDarkMode());
-    console.log("Global Properties Theme:", globalProperties?.$theme);
-    console.log("Root Theme:", instance?.proxy?.$root?.$theme);
   };
 
   onMounted(() => {
@@ -38,10 +33,20 @@
   }>();
 
   // 响应式主题变量
-  const currentTheme = ref(themeManager.isDarkMode() ? "dark" : "light");
+  const currentTheme = ref<"light" | "dark">(themeManager.isDarkMode() ? "dark" : "light");
+
+  // 定义菜单项接口
+  interface MenuItem {
+    label: string;
+    key: string;
+    value: string;
+    icon?: string;
+    disabled?: boolean;
+    children?: MenuItem[];
+  }
 
   // 菜单数据
-  const menuItems = ref<Menu.Item[]>([]);
+  const menuItems = ref<MenuItem[]>([]);
 
   // 当前选中的菜单项
   const currentSelectedKeys = ref<string[]>([]);

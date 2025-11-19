@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
   import { ref } from "vue";
-  import { TableProps } from "tdesign-vue-next";
+  import type { TableProps } from "tdesign-vue-next";
 
   interface User {
     id: number;
