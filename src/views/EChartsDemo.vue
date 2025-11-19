@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
   import { ref, onMounted, nextTick } from "vue";
+  import type { EChartsOption } from "echarts";
   import useECharts from "@/hooks/useECharts";
 
   // 图表容器引用
@@ -50,7 +51,7 @@
 
     // 确保图表完全初始化后再设置数据
     await nextTick();
-    
+
     // 稍微延时确保图表实例已完全创建
     setTimeout(() => {
       initBarChart();
@@ -67,7 +68,7 @@
         left: "center",
         textStyle: {
           fontSize: 16,
-          fontWeight: "normal",
+          fontWeight: 400,
         },
       },
       tooltip: {
@@ -98,34 +99,18 @@
           name: "2023年",
           type: "bar",
           data: [120, 200, 150, 80, 70, 110],
-          itemStyle: {
-            color: "#5470c6",
-          },
-          emphasis: {
-            itemStyle: {
-              color: "#73c0de",
-            },
-          },
         },
         {
           name: "2024年",
           type: "bar",
           data: [150, 230, 200, 100, 90, 130],
-          itemStyle: {
-            color: "#91cc75",
-          },
-          emphasis: {
-            itemStyle: {
-              color: "#fac858",
-            },
-          },
         },
       ],
       legend: {
         data: ["2023年", "2024年"],
         bottom: 0,
       },
-    };
+    } as EChartsOption;
 
     barChart.setOption(barOption);
   };
@@ -138,7 +123,7 @@
         left: "center",
         textStyle: {
           fontSize: 16,
-          fontWeight: "normal",
+          fontWeight: 400,
         },
       },
       tooltip: {
@@ -219,7 +204,7 @@
           },
         },
       ],
-    };
+    } as EChartsOption;
 
     lineChart.setOption(lineOption);
   };
@@ -232,7 +217,7 @@
         left: "center",
         textStyle: {
           fontSize: 16,
-          fontWeight: "normal",
+          fontWeight: 400,
         },
       },
       tooltip: {
@@ -264,7 +249,7 @@
             label: {
               show: true,
               fontSize: "20",
-              fontWeight: "bold",
+              fontWeight: 700,
             },
             itemStyle: {
               shadowBlur: 10,
@@ -284,7 +269,7 @@
           ],
         },
       ],
-    };
+    } as EChartsOption;
 
     pieChart.setOption(pieOption);
   };
@@ -317,7 +302,7 @@
   }
 
   .chart-item {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-primary);
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     padding: 25px;
@@ -328,7 +313,7 @@
 
   .chart-item:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 15px 40px var(--shadow-base);
   }
 
   .chart-item h2 {
@@ -339,6 +324,9 @@
     padding-bottom: 10px;
     border-bottom: 2px solid #e74c3c;
     position: relative;
+  }
+  .dark .chart-item h2 {
+    color: #ecf0f1;
   }
 
   .chart-item h2::after {

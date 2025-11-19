@@ -10,11 +10,19 @@
  * - 响应式更新配置和数据
  * - 处理窗口大小变化，自动调整图表大小
  * - 提供常用的图表操作方法
+ * - 支持主题切换同步
  */
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import type { Ref } from 'vue';
 import * as echarts from 'echarts';
 import type { EChartsOption, EChartsType } from 'echarts';
+import { themeManager } from '../utils/themeManager';
+
+// ECharts主题映射
+const echartsThemeMap = {
+  light: 'light',
+  dark: 'dark'
+} as const;
 
 /**
  * useECharts hook的配置选项
@@ -87,6 +95,12 @@ export interface EChartsInstanceMethods {
    * 获取基础的ECharts实例
    */
   getInstance: () => EChartsType | null;
+  
+  /**
+   * 更新图表主题
+   * @param newTheme 新的主题名称或配置
+   */
+  updateTheme: (newTheme?: string | object) => void;
 }
 
 /**
@@ -104,16 +118,21 @@ export function useECharts(
   // 解构配置选项，设置默认值
   const {
     autoresize = true,
-    theme,
+    theme: initialTheme,
     initOptions,
     lazy = false
   } = options;
 
   // 存储ECharts实例的ref
   const chartInstance = ref<EChartsType | null>(null);
-  
+  // 存储当前主题
+  const currentTheme = ref<string | object | undefined>(initialTheme);
   // 记录窗口大小变化的定时器
   let resizeTimer: number | null = null;
+  // 主题变化监听器的取消函数
+  let removeThemeListener: (() => void) | null = null;
+  // 全局主题事件监听器
+  let globalThemeListener: ((e: CustomEvent) => void) | null = null;
 
   /**
    * 初始化图表
@@ -146,7 +165,7 @@ export function useECharts(
       }
       
       // 创建新的ECharts实例
-      chartInstance.value = echarts.init(elRef.value, theme, initOptions);
+      chartInstance.value = echarts.init(elRef.value, currentTheme.value, initOptions);
       
       console.log('ECharts实例创建成功');
       
@@ -243,6 +262,43 @@ export function useECharts(
   };
 
   /**
+   * 更新图表主题
+   * @param newTheme 新的主题名称或配置
+   */
+  const updateTheme = async (newTheme?: string | object) => {
+    // 如果提供了新主题，更新当前主题
+    if (newTheme !== undefined) {
+      currentTheme.value = newTheme;
+    }
+
+    // 确保实例存在
+    if (!chartInstance.value) {
+      console.warn('ECharts实例不存在，无法更新主题');
+      return;
+    }
+
+    try {
+      // 获取当前配置
+      const currentOption = chartInstance.value.getOption();
+      
+      // 销毁旧实例
+      chartInstance.value.dispose();
+      
+      // 创建新实例并应用主题
+      chartInstance.value = echarts.init(elRef.value as HTMLElement, currentTheme.value, initOptions);
+      
+      // 重新应用配置
+      if (currentOption) {
+        chartInstance.value.setOption(currentOption);
+      }
+      
+      console.log('ECharts主题更新成功');
+    } catch (error) {
+      console.error('ECharts主题更新失败:', error);
+    }
+  };
+
+  /**
    * 处理窗口大小变化
    */
   const handleResize = () => {
@@ -279,6 +335,20 @@ export function useECharts(
       if (autoresize) {
         window.addEventListener('resize', handleResize);
       }
+      
+      // 注册主题变化监听器，自动同步主题
+      removeThemeListener = themeManager.onThemeChange((theme, isDark) => {
+        console.log('主题变化，更新ECharts主题:', isDark ? 'dark' : 'light');
+        updateTheme(echartsThemeMap[isDark ? 'dark' : 'light']);
+      });
+      
+      // 监听全局ECharts主题更新事件
+      globalThemeListener = (e: CustomEvent) => {
+        const { theme } = e.detail as { theme: 'light' | 'dark' };
+        console.log('全局ECharts主题更新事件触发:', theme);
+        updateTheme(echartsThemeMap[theme === 'dark' ? 'dark' : 'light']);
+      };
+      window.addEventListener('echartsThemeChange', globalThemeListener as EventListener);
     }
   });
 
@@ -287,6 +357,18 @@ export function useECharts(
     // 移除窗口大小变化监听
     if (autoresize) {
       window.removeEventListener('resize', handleResize);
+    }
+    
+    // 移除主题变化监听
+    if (removeThemeListener) {
+      removeThemeListener();
+      removeThemeListener = null;
+    }
+    
+    // 移除全局主题事件监听
+    if (globalThemeListener) {
+      window.removeEventListener('echartsThemeChange', globalThemeListener as EventListener);
+      globalThemeListener = null;
     }
     
     // 清理定时器
@@ -305,7 +387,8 @@ export function useECharts(
     dispose,
     on,
     off,
-    getInstance
+    getInstance,
+    updateTheme
   };
 }
 

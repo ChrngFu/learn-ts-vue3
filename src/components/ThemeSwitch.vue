@@ -56,6 +56,12 @@
       // 设置浅色模式
       document.documentElement.removeAttribute("theme-mode");
     }
+    
+    // 发送全局事件通知ECharts图表更新主题
+    const eventTheme = isDark ? 'dark' : 'light';
+    window.dispatchEvent(new CustomEvent('echartsThemeChange', {
+      detail: { theme: eventTheme }
+    }));
   };
 
   // 组件挂载时初始化
@@ -80,6 +86,12 @@
       } else {
         document.documentElement.removeAttribute("theme-mode");
       }
+      
+      // 发送全局事件通知ECharts图表更新主题
+      const eventTheme = isDark ? 'dark' : 'light';
+      window.dispatchEvent(new CustomEvent('echartsThemeChange', {
+        detail: { theme: eventTheme }
+      }));
     });
 
     // 组件卸载时取消注册
