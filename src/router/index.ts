@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory, type RouteRecordRaw } from "vue-router";
 
 // 定义菜单项接口
 interface MenuItem {
@@ -168,8 +168,8 @@ export function generateMenuFromRoutes(routes: AppRouteRecordRaw[], parentPath: 
 
 // 创建路由实例
 const router = createRouter({
-  // 使用项目名称作为base路径，确保正确的路由重定向
-  history: createWebHistory(import.meta.env.BASE_URL || '/learn-ts-vue3/'),
+  // 使用Hash模式避免刷新页面404问题
+  history: createWebHashHistory(import.meta.env.BASE_URL || '/learn-ts-vue3/'),
   routes: routes as RouteRecordRaw[],
 });
 
