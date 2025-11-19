@@ -92,6 +92,15 @@ export const routes: AppRouteRecordRaw[] = [
       icon: "list",
     },
   },
+  {
+    path: "/echarts",
+    name: "echarts",
+    component: () => import("@/views/EChartsDemo.vue"),
+    meta: {
+      title: "图表演示",
+      icon: "chart",
+    },
+  },
 ];
 
 // 路由菜单转换函数 - 生成符合 TDesign 菜单结构的菜单项
