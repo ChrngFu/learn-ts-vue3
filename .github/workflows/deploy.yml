@@ -1,0 +1,42 @@
+# .github/workflows/deploy.yml
+name: Deploy Vue 3 App to GitHub Pages
+
+on:
+  push:
+    branches: [master] # 监听 master 分支的推送（根据你的默认分支调整，如 master）
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write # 必须授权 pages 权限
+      id-token: write # 用于安全部署
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm" # 自动缓存 node_modules，加速构建
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app
+        run: npm run build # 生成 dist/ 目录
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload build artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "./dist" # Vite 默认输出目录
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
