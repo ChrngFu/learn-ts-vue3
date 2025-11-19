@@ -82,19 +82,19 @@ export interface EChartsInstanceMethods {
    * @param eventName 事件名称
    * @param handler 事件处理函数
    */
-  on: (eventName: string, handler: Function) => void;
+  on: (eventName: string, handler: (...args: any[]) => void) => void;
   
   /**
    * 解绑事件
    * @param eventName 事件名称
    * @param handler 事件处理函数
    */
-  off: (eventName: string, handler?: Function) => void;
+  off: (eventName: string, handler?: (...args: any[]) => void) => void;
   
   /**
    * 获取基础的ECharts实例
    */
-  getInstance: () => EChartsType | null;
+  getInstance: () => any;
   
   /**
    * 更新图表主题
@@ -236,7 +236,7 @@ export function useECharts(
    * @param eventName 事件名称
    * @param handler 事件处理函数
    */
-  const on = (eventName: string, handler: Function) => {
+  const on = (eventName: string, handler: (...args: any[]) => void) => {
     if (chartInstance.value) {
       chartInstance.value.on(eventName, handler);
     }
@@ -247,7 +247,7 @@ export function useECharts(
    * @param eventName 事件名称
    * @param handler 事件处理函数
    */
-  const off = (eventName: string, handler?: Function) => {
+  const off = (eventName: string, handler?: (...args: any[]) => void) => {
     if (chartInstance.value) {
       chartInstance.value.off(eventName, handler);
     }
@@ -257,7 +257,7 @@ export function useECharts(
    * 获取基础的ECharts实例
    * @returns ECharts实例
    */
-  const getInstance = (): EChartsType | null => {
+  const getInstance = () => {
     return chartInstance.value;
   };
 
