@@ -1,16 +1,20 @@
 <script setup lang="ts">
   import { ref, onMounted } from "vue";
   import { useRouter } from "vue-router";
+  import { Menu } from "tdesign-vue-next";
   import type { MenuProps } from "tdesign-vue-next";
-
-  // 为了避免命名冲突，重新导出Menu组件
   import { routes, generateMenuFromRoutes } from "@/router/index";
   import themeManager from "@/utils/themeManager";
 
+  const router = useRouter();
+  
   // 调试函数，检查主题值
   const debugTheme = () => {
     console.log("Theme Manager Dark Mode:", themeManager.isDarkMode());
   };
+
+  // 响应式主题变量
+  const currentTheme = ref<"light" | "dark">(themeManager.isDarkMode() ? "dark" : "light");
 
   onMounted(() => {
     // 初始化时执行一次调试
@@ -21,19 +25,27 @@
       currentTheme.value = isDark ? "dark" : "light";
       console.log("Theme changed to:", currentTheme.value);
     });
+    
+    // 初始化菜单数据
+    // 从路由生成菜单，传入空字符串作为父路径
+    const generatedMenu = generateMenuFromRoutes(routes, "");
+    menuItems.value = generatedMenu;
+    // 设置当前选中项
+    updateSelectedKeys();
+    // 更新活动菜单（用于页面刷新时）
+    updateActiveMenu();
+
+    // 监听路由变化，更新选中状态和活动菜单
+    router.afterEach(() => {
+      updateSelectedKeys();
+      updateActiveMenu();
+    });
   });
-
-  // 其他初始化代码...
-
-  const router = useRouter();
 
   // Props
   const props = defineProps<{
     expanded: boolean;
   }>();
-
-  // 响应式主题变量
-  const currentTheme = ref<"light" | "dark">(themeManager.isDarkMode() ? "dark" : "light");
 
   // 定义菜单项接口
   interface MenuItem {
@@ -53,23 +65,6 @@
 
   // 当前选中的菜单项
   const activeMenu = ref<string>("");
-
-  // 初始化菜单数据
-  onMounted(() => {
-    // 从路由生成菜单，传入空字符串作为父路径
-    const generatedMenu = generateMenuFromRoutes(routes, "");
-    menuItems.value = generatedMenu;
-    // 设置当前选中项
-    updateSelectedKeys();
-    // 更新活动菜单（用于页面刷新时）
-    updateActiveMenu();
-
-    // 监听路由变化，更新选中状态和活动菜单
-    router.afterEach(() => {
-      updateSelectedKeys();
-      updateActiveMenu();
-    });
-  });
 
   // 更新选中的菜单项
   const updateSelectedKeys = () => {
