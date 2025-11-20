@@ -101,6 +101,15 @@ export const routes: AppRouteRecordRaw[] = [
       icon: "chart",
     },
   },
+  {
+    path: "/game-2048",
+    name: "game-2048",
+    component: () => import("@/views/Game2048.vue"),
+    meta: {
+      title: "2048游戏",
+      icon: "gamepad",
+    },
+  },
 ];
 
 // 路由菜单转换函数 - 生成符合 TDesign 菜单结构的菜单项

@@ -30,4 +30,16 @@ themeManager.onThemeChange((_theme, isDark) => {
   app.config.globalProperties.$theme = isDark ? "dark" : "light";
 });
 
+app.config.errorHandler = (err, instance, info) => {
+  // 记录完整错误信息
+  console.error("Vue 应用错误:", err);
+  console.error("错误来源:", info);
+  console.error("组件实例:", instance?.$options.name || "Unknown Component");
+
+  // 在生产环境中可以发送到错误监控服务
+  // if (process.env.NODE_ENV === "production") {
+  //   sendErrorToMonitoring(err, instance, info);
+  // }
+};
+
 app.mount("#app");
